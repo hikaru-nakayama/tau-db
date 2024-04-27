@@ -10,12 +10,12 @@ type Page struct {
 	bb *bytes.Buffer
 }
 
-func NewPage(size int) *bytes.Buffer {
-	return bytes.NewBuffer(make([]byte, size))
+func NewPage(size int) *Page {
+	return &Page{bytes.NewBuffer(make([]byte, size))}
 }
 
-func NewPageFromByte(b []byte) *bytes.Buffer {
-	return bytes.NewBuffer(b)
+func NewPageFromByte(b []byte) *Page {
+	return &Page{bytes.NewBuffer(b)}
 }
 
 func (p *Page) GetInt(offset int) int {
