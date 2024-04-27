@@ -7,7 +7,7 @@ func TestEqual(t *testing.T) {
 
 	tests := []struct {
 		filename string
-		num int
+		num      int
 		expected bool
 	}{
 		{"test", 1, true},
@@ -21,5 +21,13 @@ func TestEqual(t *testing.T) {
 		if b1.Equals(&b2) != tt.expected {
 			t.Errorf("Equals return value is wrong")
 		}
+	}
+}
+
+func TestString(t *testing.T) {
+	b := BlockId{filename: "student", blknum: 10}
+
+	if "[file student, block 10]" != b.String() {
+		t.Errorf("expected=[file student, block 10]")
 	}
 }
