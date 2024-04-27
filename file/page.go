@@ -25,9 +25,30 @@ func (p *Page) GetInt(offset int) int {
 }
 
 func (p *Page) SetInt(offset int, n int) {
-
 	data := make([]byte, 4)
 	binary.BigEndian.PutUint32(data, uint32(n))
 	copy(p.bb.Bytes()[offset:], data)
 }
+
+func (p *Page) GetBytes(offset int) []byte {
+	length := p.GetInt(offset)
+	return p.bb.Bytes()[offset+4 : offset+4+length]
+}
+
+func (p *Page) SetBytes(offset int, b []byte) {
+	p.SetInt(offset, len(b))
+	copy(p.bb.Bytes()[offset+4:], b)
+}
+
+func (p *Page) GetString(offset int) string {
+	b := p.GetBytes(offset)
+	return string(b)
+}
+
+func (p *Page) SetString(offset int, s string) {
+	b := []byte(s)
+	p.SetBytes(offset, b)
+}
+
+
 
