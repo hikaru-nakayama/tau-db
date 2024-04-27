@@ -3,6 +3,7 @@ package file
 import (
 	"bytes"
 	"encoding/binary"
+	"unicode/utf8"
 )
 
 type Page struct {
@@ -50,5 +51,11 @@ func (p *Page) SetString(offset int, s string) {
 	p.SetBytes(offset, b)
 }
 
+func (p *Page) MaxLength(strlen int) int {
+	return 4 + strlen*utf8.UTFMax
+}
 
+func (p *Page) contents() *bytes.Buffer {
+	return p.bb
+}
 
