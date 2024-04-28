@@ -28,3 +28,31 @@ func TestGetInt(t *testing.T) {
 	}
 
 }
+
+func TestGetString(t *testing.T) {
+	p := NewPage(100)
+	tests := []struct {
+		offset int
+		s      string
+	}{
+		{10, "test"},
+		{50, "vim"},
+	}
+
+	for _, tt := range tests {
+		p.SetString(tt.offset, tt.s)
+		val := p.GetString(tt.offset)
+		if val != tt.s {
+			t.Errorf("expected: %s, but got: %s", tt.s, val)
+		}
+	}
+}
+
+func TestMaxLength(t *testing.T) {
+	p := NewPage(100)
+	l := len("tau-DB")
+	maxLen := p.MaxLength(l)
+	if maxLen != 28 {
+		t.Errorf("expected: %d, but got: %d", 28, maxLen)
+	}
+}
