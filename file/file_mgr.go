@@ -1,15 +1,18 @@
 package file
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 type FileMgr struct {
 	dbDirectory string
 	blockSize   int
 	openFiles   map[string]*os.File
+	mu          sync.Mutex
 }
 
 func NewFileMgr(dbDirectory string, blockSize int) *FileMgr {
@@ -38,6 +41,36 @@ func NewFileMgr(dbDirectory string, blockSize int) *FileMgr {
 		openFiles:   make(map[string]*os.File),
 	}
 
+}
+
+func (fmgr *FileMgr) Read(blk *BlockId, p *Page) error {
+	fmgr.mu.Lock()
+	defer fmgr.mu.Unlock()
+	f, err := fmgr.getFile(blk.Filename())
+	if err != nil {
+		return fmt.Errorf("can not read block. error: %w", err)
+	}
+	_, err = f.Seek(int64(blk.Number()*fmgr.blockSize), 0)
+	if err != nil {
+		return err
+	}
+	_, err = f.Read(p.contents().Bytes())
+	return err
+}
+
+func (fmgr *FileMgr) Write(blk *BlockId, p *Page) error {
+	fmgr.mu.Lock()
+	defer fmgr.mu.Unlock()
+	f, err := fmgr.getFile(blk.Filename())
+	if err != nil {
+		return fmt.Errorf("can not read block. error: %w", err)
+	}
+	_, err = f.Seek(int64(blk.Number()*fmgr.blockSize), 0)
+	if err != nil {
+		return err
+	}
+	_, err = f.Write(p.contents().Bytes())
+	return err
 }
 
 func (fmgr *FileMgr) getFile(filename string) (*os.File, error) {
