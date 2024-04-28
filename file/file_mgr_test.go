@@ -27,3 +27,21 @@ func TestNewFileMgr(t *testing.T) {
 	}
 	os.Remove(dir_name)
 }
+
+func TestLength(t *testing.T) {
+	mgr := NewFileMgr("test_db", 100)
+	f, err := mgr.getFile("testfile")
+	if err != nil {
+		t.Errorf("can not read block")
+	}
+	data := make([]byte, 350)
+	_, err = f.Write(data)
+	if err != nil {
+		t.Errorf("can not write block, err %s", err)
+	}
+	l := mgr.Length("testfile")
+	if l != 3 {
+		t.Errorf("expected: 3, but got: %d", l)
+	}
+	os.RemoveAll("test_db")
+}

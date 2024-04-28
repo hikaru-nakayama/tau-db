@@ -110,7 +110,8 @@ func (fmgr *FileMgr) BlockSize() int {
 func (fmgr *FileMgr) getFile(filename string) (*os.File, error) {
 	f, ok := fmgr.openFiles[filename]
 	if !ok {
-		f, err := os.Create(filepath.Join(fmgr.dbDirectory, filename))
+		var err error
+		f, err = os.Create(filepath.Join(fmgr.dbDirectory, filename))
 		if err != nil {
 			return nil, err
 		}
