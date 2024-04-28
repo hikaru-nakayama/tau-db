@@ -39,3 +39,15 @@ func NewFileMgr(dbDirectory string, blockSize int) *FileMgr {
 	}
 
 }
+
+func (fmgr *FileMgr) getFile(filename string) (*os.File, error) {
+	f, ok := fmgr.openFiles[filename]
+	if !ok {
+		f, err := os.Create(filepath.Join(fmgr.dbDirectory, filename))
+		if err != nil {
+			return nil, err
+		}
+		fmgr.openFiles[filename] = f
+	}
+	return f, nil
+}
