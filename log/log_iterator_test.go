@@ -18,3 +18,4 @@ func TestNewLogIterator(t *testing.T) {
 	}
 	os.RemoveAll("test_db")
 }
+
