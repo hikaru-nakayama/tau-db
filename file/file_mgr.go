@@ -73,7 +73,7 @@ func (fmgr *FileMgr) Write(blk *BlockId, p *Page) error {
 	return err
 }
 
-func (fmgr *FileMgr) Append(filename string) error {
+func (fmgr *FileMgr) Append(filename string) (*BlockId, error) {
 	fmgr.mu.Lock()
 	defer fmgr.mu.Unlock()
 	newBlockNum := fmgr.Length(filename)
@@ -81,14 +81,14 @@ func (fmgr *FileMgr) Append(filename string) error {
 	b := make([]byte, fmgr.BlockSize())
 	f, err := fmgr.getFile(filename)
 	if err != nil {
-		return fmt.Errorf("can not read block. error: %w", err)
+		return nil, fmt.Errorf("can not read block. error: %w", err)
 	}
 	_, err = f.Seek(int64(blk.Number()*fmgr.blockSize), 0)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	_, err = f.Write(b)
-	return err
+	return blk, err
 }
 
 func (fmgr *FileMgr) Length(filename string) int {
