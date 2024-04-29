@@ -2,6 +2,7 @@ package file
 
 import (
 	"testing"
+	"os"
 )
 
 func TestFile(t *testing.T) {
@@ -23,5 +24,7 @@ func TestFile(t *testing.T) {
 	if p2.GetString(pos1) != "abcdefghijklm" {
 		t.Errorf("expected: %s. but got: %s", "abcdefghijklm", p2.GetString(pos1))
 	}
+
+	os.RemoveAll("file_test")
 }
 
