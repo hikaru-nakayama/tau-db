@@ -26,12 +26,19 @@ func NewLogIterator(fm *file.FileMgr, blk *file.BlockId) *LogIterator {
 func (li *LogIterator) Next() []byte {
 	if li.currentPosition == li.fm.BlockSize() {
 		blk := file.NewBlockId(li.blk.Filename(), li.blk.Number()-1)
+		li.blk = blk
 		li.moveToBlock(blk)
 	}
 	rec := li.p.GetBytes(li.currentPosition)
 	li.currentPosition += 4 + len(rec)
 	return rec
 }
+
+func (li *LogIterator) HasNext() bool {
+	return li.currentPosition < li.fm.BlockSize() || li.blk.Number() > 0
+}
+
+
 
 func (li *LogIterator) moveToBlock(blk *file.BlockId) {
 	li.fm.Read(blk, li.p)

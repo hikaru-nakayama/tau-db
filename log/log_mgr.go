@@ -45,6 +45,10 @@ func (lm *LogMgr) Flush(lsn int) {
 	}
 }
 
+func (lm *LogMgr) Iterator() *LogIterator {
+	return NewLogIterator(lm.fm, lm.currentblk)
+}
+
 func (lm *LogMgr) Append(logrec []byte) (int, error) {
 	lm.mu.Lock()
 	defer lm.mu.Unlock()

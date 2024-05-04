@@ -16,8 +16,24 @@ func TestLog(t *testing.T) {
 	}
 
 	createReocords(1, 35, lm)
+	printLogRecords("The log file new these records: ", lm)
+
 
 	os.RemoveAll("test_db")
+}
+
+func printLogRecords(msg string, lm *LogMgr) {
+	fmt.Printf("%s", msg)
+	iter := lm.Iterator()
+	for iter.HasNext() {
+		rec := iter.Next()
+		p := file.NewPageFromByte(rec)
+		s := p.GetString(0)
+		npos := p.MaxLength(len(s))
+		val := p.GetInt(npos)
+		fmt.Printf("[%s, %d]",s, val)
+	}
+	fmt.Println("")
 }
 
 func createReocords(start int, end int, lm *LogMgr) {
