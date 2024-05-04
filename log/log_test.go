@@ -17,7 +17,8 @@ func TestLog(t *testing.T) {
 
 	createReocords(1, 35, lm)
 	printLogRecords("The log file new these records: ", lm)
-
+	lm.Flush(35)
+	printLogRecords("The log file new these records: ", lm)
 
 	os.RemoveAll("test_db")
 }
