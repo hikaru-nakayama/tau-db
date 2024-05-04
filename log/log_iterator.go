@@ -38,8 +38,6 @@ func (li *LogIterator) HasNext() bool {
 	return li.currentPosition < li.fm.BlockSize() || li.blk.Number() > 0
 }
 
-
-
 func (li *LogIterator) moveToBlock(blk *file.BlockId) {
 	li.fm.Read(blk, li.p)
 	li.boundary = li.p.GetInt(0)
