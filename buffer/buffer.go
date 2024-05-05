@@ -14,3 +14,16 @@ type Bffer struct {
 	txnum    int
 	lsn      int
 }
+
+func NewBuffer(fm *file.FileMgr, lm *log.LogMgr) *Bffer {
+	p := file.NewPage(fm.BlockSize())
+	return &Bffer{
+		fm:       fm,
+		lm:       lm,
+		contents: p,
+		blk:      nil,
+		pins:     0,
+		txnum:    -1,
+		lsn:      -1,
+	}
+}
