@@ -27,3 +27,11 @@ func NewBuffer(fm *file.FileMgr, lm *log.LogMgr) *Bffer {
 		lsn:      -1,
 	}
 }
+
+func (b *Bffer) Contents() *file.Page {
+	return b.contents
+}
+
+func (b *Bffer) Block() *file.BlockId {
+	return b.blk
+}
