@@ -5,7 +5,7 @@ import (
 	"github.com/hikaru-nakayama/tau-db.git/log"
 )
 
-type Bffer struct {
+type Buffer struct {
 	fm       *file.FileMgr
 	lm       *log.LogMgr
 	contents *file.Page
@@ -15,9 +15,9 @@ type Bffer struct {
 	lsn      int
 }
 
-func NewBuffer(fm *file.FileMgr, lm *log.LogMgr) *Bffer {
+func NewBuffer(fm *file.FileMgr, lm *log.LogMgr) *Buffer {
 	p := file.NewPage(fm.BlockSize())
-	return &Bffer{
+	return &Buffer{
 		fm:       fm,
 		lm:       lm,
 		contents: p,
@@ -28,10 +28,49 @@ func NewBuffer(fm *file.FileMgr, lm *log.LogMgr) *Bffer {
 	}
 }
 
-func (b *Bffer) Contents() *file.Page {
+func (b *Buffer) Contents() *file.Page {
 	return b.contents
 }
 
-func (b *Bffer) Block() *file.BlockId {
+func (b *Buffer) Block() *file.BlockId {
 	return b.blk
+}
+
+func (b *Buffer) SetModified(txnum int, lsn int) {
+	b.txnum = txnum
+	if lsn >= 0 {
+		b.lsn = lsn
+	}
+}
+
+func (b *Buffer) IsPined() bool {
+	return b.pins > 0
+
+}
+
+func (b *Buffer) ModifyingTx() int {
+	return b.txnum
+}
+
+func (b *Buffer) AssignToBlock(blk *file.BlockId) {
+	b.Flush()
+	b.blk = blk
+	b.fm.Read(b.blk, b.contents)
+	b.pins = 0
+}
+
+func (b *Buffer) Flush() {
+	if b.txnum >= 0 {
+		b.lm.Flush(b.lsn)
+		b.fm.Write(b.blk, b.contents)
+		b.txnum = -1
+	}
+}
+
+func (b *Buffer) Pin() {
+	b.pins++
+}
+
+func (b *Buffer) Unpin() {
+	b.pins--
 }
