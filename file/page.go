@@ -59,3 +59,6 @@ func (p *Page) contents() *bytes.Buffer {
 	return p.bb
 }
 
+func MaxLength(strlen int) int {
+	return 4 + strlen*utf8.UTFMax
+}
