@@ -1,5 +1,7 @@
 package tx
 
+import "github.com/hikaru-nakayama/tau-db.git/file"
+
 type LogRecord interface {
 	Op() int
 	TxNumber() int
@@ -14,3 +16,13 @@ const (
 	SETINT
 	SETSTRING
 )
+
+func CreateLogRecord(bytes []byte) LogRecord {
+	p := file.NewPageFromByte(bytes)
+	switch p.GetInt(0) {
+	case CHECKPOINT:
+		return NewCheckPointRecord(p)
+	default:
+		return nil
+	}
+}

@@ -17,9 +17,11 @@ func (cr *CheckPointRecord) Op() int {
 	return CHECKPOINT
 }
 
-func (cr *CheckPointRecord) TxNumber() {}
+func (cr *CheckPointRecord) TxNumber() int {
+	return -1
+}
 
-func (cr *CheckPointRecord) Undo() {}
+func (cr *CheckPointRecord) Undo(tx *Transaction) {}
 
 func CheckPointRecordWriteToLog(lm *log.LogMgr, txnum int) (int, error) {
 	rec := make([]byte, 4)

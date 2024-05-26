@@ -42,3 +42,11 @@ func (rm *RecoveryMgr) SetString(buff *buffer.Buffer, offset int, newval string)
 	blk := buff.Block()
 	return SetStringRecordWriteToLog(rm.lm, rm.txnum, blk, offset, oldval)
 }
+
+func (rm *RecoveryMgr) doRollBack() {
+	iter := rm.lm.Iterator()
+	for iter.HasNext() {
+		bytes := iter.Next()
+		rec := 
+	}
+}
