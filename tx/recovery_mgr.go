@@ -11,3 +11,34 @@ type RecoveryMgr struct {
 	tx    *Transaction
 	txnum int
 }
+
+func NewRecoveryMgr(tx *Transaction, txnum int, lm *log.LogMgr, bm *buffer.BufferMgr) *RecoveryMgr {
+	return &RecoveryMgr{
+		lm:    lm,
+		bm:    bm,
+		tx:    tx,
+		txnum: txnum,
+	}
+}
+
+func (rm *RecoveryMgr) Commit() error {
+	rm.bm.FlushAll(rm.txnum)
+	lsn, err := CommitRecordWriteToLog(rm.lm, rm.txnum)
+	if err != nil {
+		return err
+	}
+	rm.lm.Flush(lsn)
+	return nil
+}
+
+func (rm *RecoveryMgr) SetInt(buff *buffer.Buffer, offset int, newval int) (int, error) {
+	oldval := buff.Contents().GetInt(offset)
+	blk := buff.Block()
+	return SetIntRecordWriteToLog(rm.lm, rm.txnum, blk, offset, oldval)
+}
+
+func (rm *RecoveryMgr) SetString(buff *buffer.Buffer, offset int, newval string) (int, error) {
+	oldval := buff.Contents().GetString(offset)
+	blk := buff.Block()
+	return SetStringRecordWriteToLog(rm.lm, rm.txnum, blk, offset, oldval)
+}
