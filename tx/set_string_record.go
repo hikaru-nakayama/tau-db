@@ -42,6 +42,12 @@ func (ssr *SetStringRecord) TxNumber() int {
 	return ssr.txnum
 }
 
+func (ssr *SetStringRecord) Undo(tx *Transaction) {
+	tx.Pin(ssr.blk)
+	tx.SetString(ssr.blk, ssr.offset, ssr.val, false)
+	tx.UnPin(ssr.blk)
+}
+
 func SetStringRecordWriteToLog(lm *log.LogMgr, txnum int, blk *file.BlockId, offset int, val string) (int, error) {
 	tpos := 4
 	fpos := tpos + 4
