@@ -1,6 +1,8 @@
 package tx
 
 import (
+	"slices"
+
 	"github.com/hikaru-nakayama/tau-db.git/buffer"
 	"github.com/hikaru-nakayama/tau-db.git/log"
 )
@@ -65,5 +67,24 @@ func (rm *RecoveryMgr) doRollBack() {
 			}
 			rec.Undo(rm.tx)
 		}
+	}
+}
+
+func (rm *RecoveryMgr) doRecover() {
+	finishedTxs := make([]int, 0)
+	iter := rm.lm.Iterator()
+	for iter.HasNext() {
+		bytes := iter.Next()
+		rec := CreateLogRecord(bytes)
+		if rec.Op() == CHECKPOINT {
+			return
+		}
+
+		if rec.Op() == COMMIT || rec.Op() == ROLLBACK {
+			finishedTxs = append(finishedTxs, rec.TxNumber())
+		} else if !slices.Contains(finishedTxs, rec.TxNumber()) {
+			rec.Undo(rm.tx)
+		}
+
 	}
 }
