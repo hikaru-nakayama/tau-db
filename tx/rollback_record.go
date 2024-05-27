@@ -26,7 +26,7 @@ func (cr *RollBackRecord) TxNumber() int {
 	return cr.txnum
 }
 
-func (cr *RollBackRecord) Undo() {}
+func (cr *RollBackRecord) Undo(tx *Transaction) {}
 
 func RollBackRecordWriteToLog(lm *log.LogMgr, txnum int) (int, error) {
 	rec := make([]byte, 2*4)

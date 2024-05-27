@@ -47,6 +47,12 @@ func (rm *RecoveryMgr) doRollBack() {
 	iter := rm.lm.Iterator()
 	for iter.HasNext() {
 		bytes := iter.Next()
-		rec := 
+		rec := CreateLogRecord(bytes)
+		if rec.TxNumber() == rm.txnum {
+			if rec.Op() == START {
+				return
+			}
+			rec.Undo(rm.tx)
+		}
 	}
 }

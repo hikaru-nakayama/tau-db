@@ -26,7 +26,7 @@ func (cr *CommitRecord) TxNumber() int {
 	return cr.txnum
 }
 
-func (cr *CommitRecord) Undo() {}
+func (cr *CommitRecord) Undo(tx *Transaction) {}
 
 func CommitRecordWriteToLog(lm *log.LogMgr, txnum int) (int, error) {
 	rec := make([]byte, 2*4)

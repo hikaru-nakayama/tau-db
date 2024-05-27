@@ -22,6 +22,16 @@ func CreateLogRecord(bytes []byte) LogRecord {
 	switch p.GetInt(0) {
 	case CHECKPOINT:
 		return NewCheckPointRecord(p)
+	case START:
+		return NewStartRecord(p)
+	case COMMIT:
+		return NewCommitRecord(p)
+	case ROLLBACK:
+		return NewRollBackRecord(p)
+	case SETINT:
+		return NewSetIntRecord(p)
+	case SETSTRING:
+		return NewSetStringRecord(p)
 	default:
 		return nil
 	}

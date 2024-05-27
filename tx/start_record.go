@@ -26,7 +26,7 @@ func (sr *StartRecord) TxNumber() int {
 	return sr.txnum
 }
 
-func (sr *StartRecord) Undo() {}
+func (sr *StartRecord) Undo(tx *Transaction) {}
 
 func StartRecordWriteToLog(lm *log.LogMgr, txnum int) (int, error) {
 	rec := make([]byte, 2*4)
