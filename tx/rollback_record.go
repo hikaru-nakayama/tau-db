@@ -18,15 +18,15 @@ func NewRollBackRecord(p *file.Page) *RollBackRecord {
 	}
 }
 
-func (cr *RollBackRecord) Op() int {
+func (rb *RollBackRecord) Op() int {
 	return ROLLBACK
 }
 
-func (cr *RollBackRecord) TxNumber() int {
-	return cr.txnum
+func (rb *RollBackRecord) TxNumber() int {
+	return rb.txnum
 }
 
-func (cr *RollBackRecord) Undo(tx *Transaction) {}
+func (rb *RollBackRecord) Undo(tx *Transaction) {}
 
 func RollBackRecordWriteToLog(lm *log.LogMgr, txnum int) (int, error) {
 	rec := make([]byte, 2*4)
