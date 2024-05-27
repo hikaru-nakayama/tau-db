@@ -31,6 +31,17 @@ func (rm *RecoveryMgr) Commit() error {
 	return nil
 }
 
+func (rm *RecoveryMgr) RollBack() error {
+	rm.doRollBack()
+	rm.bm.FlushAll(rm.txnum)
+	lsn, err := RollBackRecordWriteToLog(rm.lm, rm.txnum)
+	if err != nil {
+		return err
+	}
+	rm.lm.Flush(lsn)
+	return nil
+}
+
 func (rm *RecoveryMgr) SetInt(buff *buffer.Buffer, offset int, newval int) (int, error) {
 	oldval := buff.Contents().GetInt(offset)
 	blk := buff.Block()
