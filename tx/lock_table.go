@@ -34,7 +34,7 @@ func (lt *LockTable) Slock(blk *file.BlockId) {
 		lt.cond.Wait()
 	}
 
-	if lt.hasOtherSlocks(blk) {
+	if lt.hasXlock(blk) {
 		panic(LockAbortException{})
 	}
 	val := lt.getLockVal(blk)
