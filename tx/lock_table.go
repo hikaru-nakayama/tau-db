@@ -9,6 +9,8 @@ import (
 
 const MAX_TIME = 10 * time.Second
 
+type LockAbortException struct{}
+
 type LockTable struct {
 	locks map[file.BlockId]int
 	mu    sync.Mutex
@@ -21,4 +23,37 @@ func NewLockTable() *LockTable {
 	}
 	lt.cond = sync.NewCond(&lt.mu)
 	return lt
+}
+
+func (lt *LockTable) Slock(blk *file.BlockId) {
+	lt.mu.Lock()
+	defer lt.mu.Unlock()
+	timestamp := time.Now()
+
+	for lt.hasOtherSlocks(blk) && !lt.waitingTooLong(timestamp) {
+		lt.cond.Wait()
+	}
+
+	if lt.hasOtherSlocks(blk) {
+		panic(LockAbortException{})
+	}
+	val := lt.getLockVal(blk)
+	lt.locks[*blk] = val + 1
+
+}
+
+func (lt *LockTable) hasOtherSlocks(blk *file.BlockId) bool {
+	return lt.getLockVal(blk) > 1
+}
+
+func (lt *LockTable) getLockVal(blk *file.BlockId) int {
+	val, ok := lt.locks[*blk]
+	if !ok {
+		return 0
+	}
+	return val
+}
+
+func (lt *LockTable) waitingTooLong(start_time time.Time) bool {
+	return time.Since(start_time) > MAX_TIME
 }
