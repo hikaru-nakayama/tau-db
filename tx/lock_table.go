@@ -30,7 +30,7 @@ func (lt *LockTable) Slock(blk *file.BlockId) {
 	defer lt.mu.Unlock()
 	timestamp := time.Now()
 
-	for lt.hasOtherXlocks(blk) && !lt.waitingTooLong(timestamp) {
+	for lt.hasXlock(blk) && !lt.waitingTooLong(timestamp) {
 		lt.cond.Wait()
 	}
 
@@ -41,7 +41,23 @@ func (lt *LockTable) Slock(blk *file.BlockId) {
 	lt.locks[*blk] = val + 1
 }
 
+func (lt *LockTable) Xlock(blk *file.BlockId) {
+	lt.mu.Lock()
+	defer lt.mu.Unlock()
+	timestamp := time.Now()
+
+	for lt.hasOtherSlocks(blk) && !lt.waitingTooLong(timestamp) {
+		lt.cond.Wait()
+	}
+	if lt.hasOtherSlocks(blk) {
+		panic(LockAbortException{})
+	}
+	lt.locks[*blk] = -1
+}
+
 func (lt *LockTable) Unlock(blk *file.BlockId) {
+	lt.mu.Lock()
+	defer lt.mu.Unlock()
 	val := lt.getLockVal(blk)
 	if val > 1 {
 		lt.locks[*blk] = val - 1
@@ -55,7 +71,7 @@ func (lt *LockTable) hasOtherSlocks(blk *file.BlockId) bool {
 	return lt.getLockVal(blk) > 1
 }
 
-func (lt *LockTable) hasOtherXlocks(blk *file.BlockId) bool {
+func (lt *LockTable) hasXlock(blk *file.BlockId) bool {
 	return lt.getLockVal(blk) < 0
 }
 
