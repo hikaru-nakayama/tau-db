@@ -39,7 +39,7 @@ func (lt *LockTable) Slock(blk *file.BlockId) {
 		panic(LockAbortException{})
 	}
 
-	// This will not be negative because lock value is -1 when has slock
+	// This will not be negative 
 	val := lt.getLockVal(blk)
 	lt.locks[*blk] = val + 1
 }
@@ -72,7 +72,8 @@ func (lt *LockTable) Unlock(blk *file.BlockId) {
 }
 
 func (lt *LockTable) hasOtherSlocks(blk *file.BlockId) bool {
-	return lt.getLockVal(blk) > 0
+	// 1 より大きい時は、他のトランザクションも Slock を取っている
+	return lt.getLockVal(blk) > 1
 }
 
 func (lt *LockTable) hasXlock(blk *file.BlockId) bool {

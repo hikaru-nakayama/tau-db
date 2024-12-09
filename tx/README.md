@@ -26,3 +26,9 @@ ACID property の 独立性の性質は、他のトランザクションに影�
 データベースエンジンは、全ての schedule が serializable になることを保証する責任を持つ。そのための一般的な技術が **lock** である。
 各 block は、2種類の lock を有する。それは、共有 lock ( slock ) と排他 lock ( xlock ) である。ある transaction が、xlock をある block にかけると、他の transaction は
 いかなる lock もその block に対してかけることができない。一方で、ある transaction が slock をかけた場合は、他の tansaction が slock をかける事は可能であるが、xlock をかけることはできない。
+
+
+### 実装
+
+各 transaction は、Concurrency maneger を持っており、lock table に lock を要求する。
+
