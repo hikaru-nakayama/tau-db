@@ -34,9 +34,12 @@ func (lt *LockTable) Slock(blk *file.BlockId) {
 		lt.cond.Wait()
 	}
 
+	// throw error in case of waitingTooLong
 	if lt.hasXlock(blk) {
 		panic(LockAbortException{})
 	}
+
+	// This will not be negative because lock value is -1 when has slock
 	val := lt.getLockVal(blk)
 	lt.locks[*blk] = val + 1
 }
@@ -46,10 +49,11 @@ func (lt *LockTable) Xlock(blk *file.BlockId) {
 	defer lt.mu.Unlock()
 	timestamp := time.Now()
 
-	for (lt.hasOtherSlocks(blk) || lt.hasXlock(blk)) && !lt.waitingTooLong(timestamp) {
+	// If an Xlock is already held and no Slock is held, nothing needs to be done. So, there is no need to add the hasXlock condition.
+	for lt.hasOtherSlocks(blk) && !lt.waitingTooLong(timestamp) {
 		lt.cond.Wait()
 	}
-	if lt.hasOtherSlocks(blk) || lt.hasXlock(blk) {
+	if lt.hasOtherSlocks(blk) {
 		panic(LockAbortException{})
 	}
 	lt.locks[*blk] = -1
