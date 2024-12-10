@@ -1,6 +1,9 @@
 package tx
 
-import "github.com/hikaru-nakayama/tau-db.git/file"
+import (
+	"github.com/hikaru-nakayama/tau-db.git/file"
+	"github.com/hikaru-nakayama/tau-db.git/buffer"
+)
 
 type ITransaction interface {
 	Pin(blk *file.BlockId)
@@ -11,4 +14,13 @@ type ITransaction interface {
 
 type Transaction struct {
 	ITransaction
+	nextTxNum int
+	recoveryMgr *RecoveryMgr
+	ConcurrencyMgr *ConcurrencyMgr
+	fileMgr *file.FileMgr
+	bufferMgr *buffer.BufferMgr
+	txnum int
+	bufferList BufferList
 }
+
+
