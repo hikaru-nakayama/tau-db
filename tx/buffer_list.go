@@ -44,6 +44,17 @@ func (bl *BufferList) UnPin(blk *file.BlockId) {
 	}
 }
 
+func (bl *BufferList) UnPinAll() {
+	for _, blk := range bl.pins {
+		buff := bl.buffers[blk]
+		bl.bm.Unpin(buff)
+	}
+
+	bl.buffers = make(map[file.BlockId]*buffer.Buffer)
+	bl.pins = make([]file.BlockId, 0)
+
+}
+
 func (bl *BufferList) containsBlockInPins(blk file.BlockId) bool {
 	for _, b := range bl.pins {
 		if b == blk {
