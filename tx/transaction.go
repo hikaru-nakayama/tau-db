@@ -17,6 +17,8 @@ type ITransaction interface {
 
 var nextTxNum int32 = 0
 
+const END_OF_FILE int = -1
+
 type Transaction struct {
 	ITransaction
 	nextTxNum      int
@@ -80,6 +82,66 @@ func (tx *Transaction) GetString(blk *file.BlockId, offset int) string {
 	tx.concurrencyMgr.Slock(blk)
 	buff := tx.bufferList.GetBuffer(blk)
 	return buff.Contents().GetString(offset)
+}
+
+func (tx *Transaction) SetInt(blk *file.BlockId, offset int, val int, okToLog bool) error {
+	tx.concurrencyMgr.Xlock(blk)
+	buff := tx.bufferList.GetBuffer(blk)
+	lsn := -1
+	var err error
+
+	if okToLog {
+		lsn, err = tx.recoveryMgr.SetInt(buff, offset, val)
+		if err != nil {
+			return err
+		}
+	}
+	p := buff.Contents()
+	p.SetInt(offset, val)
+	buff.SetModified(tx.txnum, lsn)
+	return nil
+}
+
+func (tx *Transaction) SetString(blk *file.BlockId, offset int, val string, okToLog bool) error {
+	tx.concurrencyMgr.Xlock(blk)
+	buff := tx.bufferList.GetBuffer(blk)
+	lsn := -1
+	var err error
+
+	if okToLog {
+		lsn, err = tx.recoveryMgr.SetString(buff, offset, val)
+		if err != nil {
+			return err
+		}
+	}
+	p := buff.Contents()
+	p.SetString(offset, val)
+	buff.SetModified(tx.txnum, lsn)
+	return nil
+}
+
+func (tx *Transaction) Size(filename string) int {
+	dummyblk := file.NewBlockId(filename, END_OF_FILE)
+	tx.concurrencyMgr.Slock(dummyblk)
+	return tx.fileMgr.Length(filename)
+}
+
+func (tx *Transaction) Append(filename string) (*file.BlockId, error) {
+	dummyblk := file.NewBlockId(filename, END_OF_FILE)
+	tx.concurrencyMgr.Xlock(dummyblk)
+	blk, err := tx.fileMgr.Append(filename)
+	if err != nil {
+		return nil, err
+	}
+	return blk, nil
+}
+
+func (tx *Transaction) BlockSize() int {
+	return tx.fileMgr.BlockSize()
+}
+
+func (tx *Transaction) AvailableBuffs() int {
+	return tx.bufferMgr.Available()
 }
 
 var mu sync.Mutex
