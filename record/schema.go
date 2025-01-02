@@ -29,13 +29,13 @@ func (sch *Schema) AddField(field_name string, field_type int, length int) {
 	}
 }
 
-func (sch *Schema) AddIntFiled(field_name string) {
+func (sch *Schema) AddIntField(field_name string) {
 	// do not use length when type is integer
 	sch.AddField(field_name, Integer, 0)
 
 }
 
-func (sch *Schema) AddStringFiled(field_name string, length int) {
+func (sch *Schema) AddStringField(field_name string, length int) {
 	sch.AddField(field_name, Varchar, length)
 }
 
@@ -47,8 +47,8 @@ func (sch *Schema) Add(field_name string, schema Schema) {
 }
 
 func (sch *Schema) AddAll(schema Schema) {
-	for _, field_name := range sch.Fields {
-		sch.Add(field_name, *sch)
+	for _, field_name := range schema.Fields {
+		sch.Add(field_name, schema)
 	}
 }
 
