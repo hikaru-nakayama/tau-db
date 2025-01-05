@@ -30,7 +30,7 @@ func (sch *Schema) AddField(field_name string, field_type int, length int) {
 }
 
 func (sch *Schema) AddIntField(field_name string) {
-	// do not use length when type is integer
+	// length is not used when type is integer
 	sch.AddField(field_name, Integer, 0)
 
 }
@@ -64,7 +64,7 @@ func (sch *Schema) HasField(field_name string) bool {
 func (sch *Schema) Type(field_name string) (int, error) {
 	info, ok := sch.Info[field_name]
 	if !ok {
-		return 0, errors.New("filed not found")
+		return 0, errors.New("field not found")
 	}
 
 	return info.Type, nil
@@ -73,7 +73,7 @@ func (sch *Schema) Type(field_name string) (int, error) {
 func (sch *Schema) Length(field_name string) (int, error) {
 	info, ok := sch.Info[field_name]
 	if !ok {
-		return 0, errors.New("filed not found")
+		return 0, errors.New("field not found")
 	}
 
 	return info.Length, nil
